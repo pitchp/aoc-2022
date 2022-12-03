@@ -6,7 +6,7 @@ var input = data.split('\n').map(Number);
 var elves = [];
 var sum = 0;
 
-for (var i = 0; i <= input.length; i++)
+for (var i = 0; i < input.length; i++)
 {
     
     if (input[i] > 0)
