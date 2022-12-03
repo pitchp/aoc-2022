@@ -19,9 +19,9 @@ for (var i = 0; i <= input.length; i++)
         sum = 0;
     }
 }
-var max = Math.max(...elves);
-console.log("Day 1 Part 1 answer is: " + max);
 
-var topthree = elves.sort(function(a, b){return b-a});
+var result = elves.sort(function(a, b){return b-a});
 
-console.log("Day 1 Part 2 answer is: " + (topthree[0] + topthree[1] + topthree[2]));
+console.log("Day 1 Part 1 answer is: " + result[0]);
+
+console.log("Day 1 Part 2 answer is: " + (result[0] + result[1] + result[2]));
