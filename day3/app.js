@@ -1,8 +1,7 @@
 const fs = require('fs');
-const data = fs.readFileSync('./sample.txt',
+const data = fs.readFileSync('./input.txt',
              {encoding:'utf8', flag:'r'});
 let input = data.split('\n');
-
 
 //A-Z unicode char code 65-90
 //a-z unicode char code 97-122
@@ -10,17 +9,26 @@ let input = data.split('\n');
 //A-Z minus 38 for result value 27-52
 //a-z minus 96 for result value  1-26
 
-let result = 0;
+let p1Result = 0;
 
 for (let i = 0; i < input.length; i++)
 {
     let rucksack = splitRucksack(input[i]);
-    result += searchRucksack(rucksack);
+    let temp = 0;
+    p1Result += searchRucksack(rucksack);
 }
 
-console.log("Day 3 Part 1 Answer is: " + result);
-// console.log(input.slice(0,3));
-// console.log(input.slice(6));
+console.log("Day 3 Part 1 Answer is: " + p1Result);
+
+let p2Result = 0;
+
+for (let i = 0; i < input.length; i += 3)
+{
+    let rucksack = input.slice(i, i+3);
+    p2Result += searchRucksack(rucksack);
+}
+
+console.log("Day 3 Part 1 Answer is: " + p2Result);
 
 function splitRucksack(rucksack)
 {
