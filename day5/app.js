@@ -23,7 +23,7 @@ let instructions = numbersFromInstructions(input);
 let reArrCrate = JSON.parse(JSON.stringify(crateData));
 reArrCrate = moveCrate(instructions, reArrCrate, 1);
 
-let reArrCrate2 = JSON.parse(JSON.stringify(crateData));
+let reArrCrate2 = crateData.slice().map(n => n.slice());
 reArrCrate2 = moveCrate(instructions, reArrCrate2, 0);
 
 console.log("Day 5 Part 1 Answer is: " + getTopStackMsg(reArrCrate));
