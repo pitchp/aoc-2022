@@ -1,2 +1,2 @@
-# excluding puzzle input file
-input.txt
+# excluding text file (e.g. sample data, input data)
+*.txt
