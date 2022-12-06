@@ -3,8 +3,11 @@ const data = fs.readFileSync('./input.txt',
              {encoding:'utf8', flag:'r'});
 
 
-console.log("Day 6 Part 1 Answer is: " + findMarker(data, 4));
-console.log("Day 6 Part 2 Answer is: " + findMarker(data, 14));
+const packetSize = 4;
+const messageSize = 14;
+
+console.log("Day 6 Part 1 Answer is: " + findMarker(data, packetSize));
+console.log("Day 6 Part 2 Answer is: " + findMarker(data, messageSize));
 
 
 
