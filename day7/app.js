@@ -5,12 +5,22 @@ const data = fs.readFileSync('./input.txt',
 let input = data.split('\n');
 
 let root = new directory("/",null);
-
 executeInput(input, root);
 
 let sum = 0;
 let under = 100000;
 console.log("Day 7 Part 1 Answer is : " + sumAllUnder(root, sum, under));
+
+let totalDiskSpace = 70000000;
+let requiredDiskSpace = 30000000;
+let freeDiskSpace = totalDiskSpace - root.size;
+let unusedDiskSpace = requiredDiskSpace - freeDiskSpace;
+let resultArr = [];
+
+findAllOver(root, resultArr, unusedDiskSpace)
+resultArr.sort((a,b) => a-b); 
+
+console.log("Day 7 Part 2 Answer is : " + resultArr[0]);
 
 function directory(name, parent)
 {
@@ -105,4 +115,24 @@ function sumAllUnder(dirObj, sum, under)
         }
     }
     return sum;
+}
+
+function findAllOver(dirObj, resultArr, over)
+{
+    let childArr = dirObj.child;
+    for (let i = 0; i < childArr.length; i++)
+    {
+        if (childArr[i].constructor.name == "directory")
+        {
+            if (childArr[i].size >= over)
+            {
+                resultArr.push(childArr[i].size);
+            }
+            if (childArr[i].child.length > 0)
+            {
+                findAllOver(childArr[i], resultArr, over);
+            }
+        }
+    }
+    return resultArr;
 }
