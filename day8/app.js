@@ -14,8 +14,12 @@ let visibleTreeDict = {};
 // lookThroughColumns(transposedInput, "U>D");
 // lookThroughColumns(transposedInput, "D>U");
 
-// console.log(visibleTreeDict);
-// console.log(Object.keys(visibleTreeDict).length);
+lookThrough(input, "Left");
+// lookThrough(input, "Right");
+
+
+console.log(visibleTreeDict);
+console.log(Object.keys(visibleTreeDict).length);
 
 /*
 To rewrite lookThrough function into one function
@@ -25,6 +29,49 @@ Top -> transpose(i,j) to j, i
 Down -> reverse() ABS(j - 4), i
 
 */
+
+function lookThrough(input, direction)
+{
+    for (let i = 0; i < input.length; i++)
+    {
+        let row = [];
+        if (direction == "Left")
+        {
+            row = input[i].split('').map(Number);
+        }
+        else if (direction == "Right")
+        {
+            row = input[i].split('').reverse().map(Number);
+        }
+        const firstTree = 0
+        const lastTree  = row.length - 1;
+        const firstRow = 0;
+        const lastRow = input.length - 1;
+        let highest = 0;
+        for (let j = 0; j < row.length; j++)
+        {
+            let currTree = row[j];
+            let leftTree = row[j - 1];
+            let rightTree = row[j + 1];
+            if (i == firstRow || i == lastRow || j == firstTree || j == lastTree)
+            {
+                treeDictFlagger(visibleTreeDict, i, j, direction);
+                highest = currTree;
+            }
+            else if (currTree > leftTree)
+            {
+                treeDictFlagger(visibleTreeDict, i, j, direction);
+                highest = currTree;
+            }
+            else if (currTree <= rightTree && rightTree <= highest)
+            {
+                break;
+            }
+        }
+    }
+}
+
+
 
 
 function lookThroughRows(input, direction)
@@ -197,9 +244,17 @@ function transposeTree(matrix)
     return grid;
 }
 
-function treeDictFlagger(dictionary, coordX, coordY)
+function treeDictFlagger(dictionary, coordX, coordY, direction)
 {
-    let key = coordX + "," + coordY;
+    let key;
+    if (direction == "Left")
+    {
+        key = coordX + "," + coordY;
+    }
+    else if (direction == "Right")
+    {
+        key = coordX + "," + Math.abs(coordY - 4);
+    }
     if (dictionary[key] == undefined)
     {
         dictionary[key] = 1;
