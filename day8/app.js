@@ -5,33 +5,25 @@ const data = fs.readFileSync('./sample.txt',
              {encoding:'utf8', flag:'r'});
 let input = data.split('\n');
 
-console.log(input);
-let transposedInput = transposeTree(input.slice());
-console.log(transposedInput);
 let visibleTreeDict = {};
-// lookThroughRows(input, "L>R");
-// lookThroughRows(input, "R>L");
-// lookThroughColumns(transposedInput, "U>D");
-// lookThroughColumns(transposedInput, "D>U");
 
 lookThrough(input, "Left");
-// lookThrough(input, "Right");
+lookThrough(input, "Right");
+lookThrough(input, "Up");
+lookThrough(input, "Down");
 
 
-console.log(visibleTreeDict);
-console.log(Object.keys(visibleTreeDict).length);
-
-/*
-To rewrite lookThrough function into one function
-Left -> i,j
-Right -> i, reverse() ABS(j - 4)
-Top -> transpose(i,j) to j, i
-Down -> reverse() ABS(j - 4), i
-
-*/
+// console.log(visibleTreeDict);
+let p1Ans = Object.keys(visibleTreeDict).length;
+console.log("Day 8 Part 1 Answer is: " + p1Ans);
 
 function lookThrough(input, direction)
 {
+    let transposedInput = [];
+    if (direction == "Up" || direction == "Down")
+    {
+        transposedInput = transposeTree(input.slice());
+    }
     for (let i = 0; i < input.length; i++)
     {
         let row = [];
@@ -43,185 +35,85 @@ function lookThrough(input, direction)
         {
             row = input[i].split('').reverse().map(Number);
         }
+        else if (direction == "Up")
+        {
+            row = transposedInput[i].map(Number);
+        }
+        else if (direction == "Down")
+        {
+            row = transposedInput[i].reverse().map(Number);
+        }
+        part1CompareTree(row, input, i, direction);
+    }
+}
+
+function part1CompareTree(row, input, i, direction)
+{
         const firstTree = 0
         const lastTree  = row.length - 1;
         const firstRow = 0;
         const lastRow = input.length - 1;
-        let highest = 0;
+        let highest = Math.max(...row);
+        let highestSeen = 0;
+
         for (let j = 0; j < row.length; j++)
         {
             let currTree = row[j];
             let leftTree = row[j - 1];
             let rightTree = row[j + 1];
+
             if (i == firstRow || i == lastRow || j == firstTree || j == lastTree)
             {
-                treeDictFlagger(visibleTreeDict, i, j, direction);
-                highest = currTree;
+                treeDictFlagger(visibleTreeDict, i, j, direction, row.length);
+                highestSeen = currTree;
             }
-            else if (currTree > leftTree)
+
+            if (currTree > highestSeen && currTree != highest)
             {
-                treeDictFlagger(visibleTreeDict, i, j, direction);
-                highest = currTree;
+                treeDictFlagger(visibleTreeDict, i, j, direction, row.length);
+                highestSeen = currTree;
             }
-            else if (currTree <= rightTree && rightTree <= highest)
+            else if (currTree == highest)
             {
+                treeDictFlagger(visibleTreeDict, i, j, direction, row.length);
                 break;
             }
         }
-    }
 }
 
+// function part2TreeScore(row, input, i, direction)
+// {
+//         const firstTree = 0
+//         const lastTree  = row.length - 1;
+//         const firstRow = 0;
+//         const lastRow = input.length - 1;
+//         let selfHeight = 0;
+//         let score = 0;
+        
+//         for (let j = 0; j < row.length; j++)
+//         {
+//             let currTree = row[j];
+//             let leftTree = row[j - 1];
+//             let rightTree = row[j + 1];
 
+//             if (i == firstRow || i == lastRow || j == firstTree || j == lastTree)
+//             {
+//                 treeDictFlagger(visibleTreeDict, i, j, direction, row.length);
+//                 highestSeen = currTree;
+//             }
 
-
-function lookThroughRows(input, direction)
-{
-    for (let i = 0; i < input.length; i++)
-    {
-        let row = input[i].split('').map(Number);
-        const firstTree = 0
-        const lastTree  = row.length - 1;
-        const firstRow = 0;
-        const lastRow = input.length - 1;
-        let highest = 0;
-        if (direction == "L>R")
-        {
-            for (let j = 0; j < row.length; j++)
-            {
-                let currTree = row[j];
-                let leftTree = row[j - 1];
-                let rightTree = row[j + 1];
-                if (i == firstRow || i == lastRow || j == firstTree || j == lastTree)
-                {
-                    treeDictFlagger(visibleTreeDict, i, j);
-                    highest = currTree;
-                }
-                else if (currTree > leftTree)
-                {
-                    treeDictFlagger(visibleTreeDict, i, j);
-                    highest = currTree;
-                }
-                else if (currTree <= rightTree && rightTree <= highest)
-                {
-                    break;
-                }
-            }
-        }
-        else if (direction == "R>L")
-        {
-            for (let j = row.length - 1; j > - 1; j--)
-            {
-                let currTree = row[j];
-                let rightTree = row[j + 1];
-                let leftTree = row[j - 1];
-                if (i == firstRow || i == lastRow || j == firstTree || j == lastTree)
-                {
-                    treeDictFlagger(visibleTreeDict, i, j);
-                    highest = currTree;
-                }
-                else if (currTree > rightTree)
-                {
-                    treeDictFlagger(visibleTreeDict, i, j);
-                    highest = currTree
-                }
-                else if (currTree <= leftTree && leftTree <= highest)
-                {
-                    break;
-                }
-            }
-        }
-    }
-}
-
-function lookThroughColumns(input, direction)
-{
-    let newInput = transposeTree(input);
-    for (let i = 0; i < input.length; i++)
-    {
-        let row = input[i].map(Number);
-        const firstTree = 0
-        const lastTree  = row.length - 1;
-        const firstRow = 0;
-        const lastRow = input.length - 1;
-        let highest = 0;
-        if (direction == "U>D")
-        {
-            for (let j = 0; j < row.length; j++)
-            {
-                let currTree = row[j];
-                let upTree = row[j - 1];
-                let downTree = row[j + 1];
-                if (currTree > upTree || highest == 0)
-                {
-                    highest = currTree;
-                }
-                console.log("Current row:" + row);
-                console.log("Current Tree: " + currTree);
-                console.log("DownTree: " + downTree);
-                console.log("highest: " + highest);
-                if (i == firstRow || i == lastRow || j == firstTree || j == lastTree)
-                {
-                    treeDictFlagger(visibleTreeDict, j, i);
-                }
-                else if (currTree > upTree)
-                {
-                    treeDictFlagger(visibleTreeDict, j, i);
-                    if (currTree <= downTree && downTree <= highest)
-                    {
-                        break;
-                    }
-                }
-                else if (currTree <= downTree && downTree <= highest)
-                {
-                    break;
-                }
-            }
-        }
-        else if (direction == "D>U")
-        {
-            for (let j = row.length - 1; j > -1; j--)
-            {
-                let currTree = parseInt(row[j]);
-                let downTree = parseInt(row[j + 1]);
-                let upTree = parseInt(row[j - 1]);
-
-                if (currTree > downTree || highest == 0)
-                {
-                    highest = currTree;
-                }
-
-                console.log("Current row:" + row);
-                console.log("Current Tree: " + currTree);
-                console.log("Uptree: " + upTree);
-                console.log("highest: " + highest);
-
-
-                if (i == firstRow || i == lastRow || j == firstTree || j == lastTree)
-                {
-                    treeDictFlagger(visibleTreeDict, j, i);
-                }
-                else if (currTree > downTree)
-                {
-                    treeDictFlagger(visibleTreeDict, j, i);
-                    if (currTree <= upTree && upTree <= highest);
-                    {
-                        break;
-                    }
-                }
-                else if (currTree <= upTree && upTree <= highest);
-                {
-                    console.log(currTree <= upTree);
-                    console.log(upTree <= highest);
-                    console.log(typeof currTree);
-                    console.log(typeof upTree);
-                    console.log(typeof highest);
-                    console.log("test");
-                    break;
-                }
-            }
-        }
-    }
-}
+//             if (currTree > highestSeen && currTree != highest)
+//             {
+//                 treeDictFlagger(visibleTreeDict, i, j, direction, row.length);
+//                 highestSeen = currTree;
+//             }
+//             else if (currTree == highest)
+//             {
+//                 treeDictFlagger(visibleTreeDict, i, j, direction, row.length);
+//                 break;
+//             }
+//         }
+// }
 
 function transposeTree(matrix)
 {
@@ -244,7 +136,7 @@ function transposeTree(matrix)
     return grid;
 }
 
-function treeDictFlagger(dictionary, coordX, coordY, direction)
+function treeDictFlagger(dictionary, coordX, coordY, direction, arrLength)
 {
     let key;
     if (direction == "Left")
@@ -253,7 +145,44 @@ function treeDictFlagger(dictionary, coordX, coordY, direction)
     }
     else if (direction == "Right")
     {
-        key = coordX + "," + Math.abs(coordY - 4);
+        key = coordX + "," + Math.abs(coordY - arrLength + 1);
+    }
+    else if (direction == "Up")
+    {
+        key = coordY + "," + coordX;
+    }
+    else if (direction == "Down")
+    {
+        key = Math.abs(coordY - arrLength + 1) + "," + coordX;
+    }
+    if (dictionary[key] == undefined)
+    {
+        dictionary[key] = 1;
+    }
+}
+
+function treeDictFlagger(dictionary, coordX, coordY, direction, arrLength, score)
+{
+    let key;
+    if (direction == "Left")
+    {
+        key = coordX + "," + coordY;
+        dictionary[key] *= score;
+    }
+    else if (direction == "Right")
+    {
+        key = coordX + "," + Math.abs(coordY - arrLength + 1);
+        dictionary[key] *= score;
+    }
+    else if (direction == "Up")
+    {
+        key = coordY + "," + coordX;
+        dictionary[key] *= score;
+    }
+    else if (direction == "Down")
+    {
+        key = Math.abs(coordY - arrLength + 1) + "," + coordX;
+        dictionary[key] *= score;
     }
     if (dictionary[key] == undefined)
     {
