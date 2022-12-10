@@ -1,23 +1,30 @@
 const { dir } = require('console');
 const fs = require('fs');
 const { uptime } = require('process');
-const data = fs.readFileSync('./sample.txt',
+const data = fs.readFileSync('./input.txt',
              {encoding:'utf8', flag:'r'});
 let input = data.split('\n');
 
 let visibleTreeDict = {};
 
-lookThrough(input, "Left");
-lookThrough(input, "Right");
-lookThrough(input, "Up");
-lookThrough(input, "Down");
-
-
-// console.log(visibleTreeDict);
+lookThrough(input, "Left", "Part1");
+lookThrough(input, "Right", "Part1");
+lookThrough(input, "Up", "Part1");
+lookThrough(input, "Down", "Part1");
 let p1Ans = Object.keys(visibleTreeDict).length;
 console.log("Day 8 Part 1 Answer is: " + p1Ans);
 
-function lookThrough(input, direction)
+lookThrough(input, "Left", "Part2");
+lookThrough(input, "Right", "Part2");
+lookThrough(input, "Up", "Part2");
+lookThrough(input, "Down", "Part2");
+
+let keys = Object.keys(visibleTreeDict).sort((a,b) => { return visibleTreeDict[b] - visibleTreeDict[a] });
+let p2Ans = visibleTreeDict[keys[0]];
+console.log("Day 8 Part 2 Answer is: " + p2Ans);
+
+
+function lookThrough(input, direction, partFlag)
 {
     let transposedInput = [];
     if (direction == "Up" || direction == "Down")
@@ -43,7 +50,15 @@ function lookThrough(input, direction)
         {
             row = transposedInput[i].reverse().map(Number);
         }
-        part1CompareTree(row, input, i, direction);
+
+        if (partFlag == "Part1")
+        {
+            part1CompareTree(row, input, i, direction);
+        }
+        else if (partFlag == "Part2")
+        {
+            part2TreeScore(row, input, i, direction);
+        }
     }
 }
 
@@ -59,8 +74,6 @@ function part1CompareTree(row, input, i, direction)
         for (let j = 0; j < row.length; j++)
         {
             let currTree = row[j];
-            let leftTree = row[j - 1];
-            let rightTree = row[j + 1];
 
             if (i == firstRow || i == lastRow || j == firstTree || j == lastTree)
             {
@@ -81,39 +94,48 @@ function part1CompareTree(row, input, i, direction)
         }
 }
 
-// function part2TreeScore(row, input, i, direction)
-// {
-//         const firstTree = 0
-//         const lastTree  = row.length - 1;
-//         const firstRow = 0;
-//         const lastRow = input.length - 1;
-//         let selfHeight = 0;
-//         let score = 0;
+function part2TreeScore(row, input, i, direction)
+{
+        const firstTree = 0
+        const lastTree  = row.length - 1;
+        const firstRow = 0;
+        const lastRow = input.length - 1;
         
-//         for (let j = 0; j < row.length; j++)
-//         {
-//             let currTree = row[j];
-//             let leftTree = row[j - 1];
-//             let rightTree = row[j + 1];
+        for (let j = 0; j < row.length; j++)
+        {
+            let currTree = row[j];
+            let selfHeight = currTree;
+            let score = 0;
 
-//             if (i == firstRow || i == lastRow || j == firstTree || j == lastTree)
-//             {
-//                 treeDictFlagger(visibleTreeDict, i, j, direction, row.length);
-//                 highestSeen = currTree;
-//             }
+            for (let k = j; k < row.length; k++)
+            {
 
-//             if (currTree > highestSeen && currTree != highest)
-//             {
-//                 treeDictFlagger(visibleTreeDict, i, j, direction, row.length);
-//                 highestSeen = currTree;
-//             }
-//             else if (currTree == highest)
-//             {
-//                 treeDictFlagger(visibleTreeDict, i, j, direction, row.length);
-//                 break;
-//             }
-//         }
-// }
+                let rightTree = row[k + 1];
+
+                if (i == firstRow || i == lastRow || j == firstTree || j == lastTree)
+                {
+                    treeDictScore(visibleTreeDict, i, j, direction, row.length, 0);
+                    break;
+                }
+
+                if (rightTree < selfHeight)
+                {
+                    score += 1;
+                }
+                else if (rightTree >= selfHeight && rightTree != undefined)
+                {
+                    score += 1;
+                    treeDictScore(visibleTreeDict, i, j, direction, row.length, score);
+                    break;
+                }
+                else if (rightTree == undefined)
+                {
+                    treeDictScore(visibleTreeDict, i, j, direction, row.length, score);
+                    break;
+                }
+            }
+        }
+}
 
 function transposeTree(matrix)
 {
@@ -161,31 +183,32 @@ function treeDictFlagger(dictionary, coordX, coordY, direction, arrLength)
     }
 }
 
-function treeDictFlagger(dictionary, coordX, coordY, direction, arrLength, score)
+function treeDictScore(dictionary, coordX, coordY, direction, arrLength, score)
 {
     let key;
     if (direction == "Left")
     {
         key = coordX + "," + coordY;
-        dictionary[key] *= score;
     }
     else if (direction == "Right")
     {
         key = coordX + "," + Math.abs(coordY - arrLength + 1);
-        dictionary[key] *= score;
     }
     else if (direction == "Up")
     {
         key = coordY + "," + coordX;
-        dictionary[key] *= score;
     }
     else if (direction == "Down")
     {
         key = Math.abs(coordY - arrLength + 1) + "," + coordX;
-        dictionary[key] *= score;
     }
+
     if (dictionary[key] == undefined)
     {
-        dictionary[key] = 1;
+        dictionary[key] = score;
+    }
+    else
+    {
+        dictionary[key] *= score;
     }
 }
